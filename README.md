@@ -118,38 +118,44 @@ aws s3 ls s3://tryout-auth-static-site-s3-bucket/
 # (nothing listed)
 aws s3 sync --dryrun docs/ s3://tryout-auth-static-site-s3-bucket/
 # (dryrun) upload: docs/index.html to s3://tryout-auth-static-site-s3-bucket/index.html
+# ...
 aws s3 sync docs/ s3://tryout-auth-static-site-s3-bucket/
 # upload: docs/index.html to s3://tryout-auth-static-site-s3-bucket/index.html
+# ...
 aws s3 ls s3://tryout-auth-static-site-s3-bucket/
 # 2025-03-04 ...        892 index.html
+# ...
 aws s3 rm --recursive --dryrun s3://tryout-auth-static-site-s3-bucket/
 # (dryrun) delete: s3://tryout-auth-static-site-s3-bucket/index.html
+# ...
 aws s3 rm --recursive s3://tryout-auth-static-site-s3-bucket/
 # delete: s3://tryout-auth-static-site-s3-bucket/index.html
+# ...
 aws s3 ls s3://tryout-auth-static-site-s3-bucket/
 # (nothing listed)
 aws s3 sync docs/ s3://tryout-auth-static-site-s3-bucket/
 # upload: docs/index.html to s3://tryout-auth-static-site-s3-bucket/index.html
+# ...
 ```
 
 ## Step 1.6: Make the S3 bucket a static website
 
 ```bash
-aws s3 website s3://tryout-auth-static-site-s3-bucket/ --index-document index.html --error-document index.html
+aws s3 website s3://tryout-auth-static-site-s3-bucket/ --index-document index.html --error-document 404.html
 ```
 
 Visit <https://us-east-1.console.aws.amazon.com/s3/>, and in the ‘General
 purpose buckets’ list click the ‘tryout-auth-static-site-s3-bucket’ link.
 
-You should see the index.html’ file listed under ‘Objects’.
+You should see the ‘index.html’ file listed under ‘Objects’.
 
 Click the ‘Properties’ tab, scroll to the ‘Static website hosting’ section, and
 click <http://tryout-auth-static-site-s3-bucket.s3-website-us-east-1.amazonaws.com>.
-You should see “403 Forbidden ... Access Denied”, because the bucket is private.
+You’ll see “403 Forbidden ... Access Denied” (the bucket is currently private).
 
-Scroll back up and click the ‘Permissions’ tab, and click ‘Edit’ in the
-‘Block public access (bucket settings)’ section. Uncheck the ‘Block all public
-access’ checkbox, and click the ‘Save changes’ button. Type “confirm” in the
+Scroll back up, click the ‘Permissions’ tab, and click ‘Edit’ in the ‘Block
+public access (bucket settings)’ section. Uncheck the ‘Block all public access’
+checkbox, and click the ‘Save changes’ button. Type “confirm” in the
 confirmation dialog, and click the ‘Confirm’ button.
 
 Scroll down to the ‘Bucket policy’ section, click the ‘Edit’ button, and paste
@@ -157,21 +163,20 @@ the following policy:
 
 ```json
 {
-	"Version": "2012-10-17",
-	"Statement": [
-		{
-			"Sid": "PublicReadGetObject",
-			"Effect": "Allow",
-			"Principal": "*",
-			"Action": "s3:GetObject",
-			"Resource": "arn:aws:s3:::tryout-auth-static-site-s3-bucket/*"
-		}
-	]
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::tryout-auth-static-site-s3-bucket/*"
+        }
+    ]
 }
 ```
 
 Click the ‘Save changes’ button.
 
-Refresh the <http://tryout-auth-static-site-s3-bucket.s3-website-us-east-1.amazonaws.com>
-page - you should see the “tryout-auth-static-site ...” page. Note that all
-routes point to the index.html page, because we set `--error-document index.html`.
+Refresh <http://tryout-auth-static-site-s3-bucket.s3-website-us-east-1.amazonaws.com>
+in your browser - you should see the “tryout-auth-static-site ...” page.
